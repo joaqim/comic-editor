@@ -53,7 +53,6 @@ class Page extends React.Component {
 		console.log(img)
 		image_arr.map(name => `<img src='${name}' alt='${name}' />`);
 
-
 	}
 
 	componentDidMount() {
@@ -63,7 +62,8 @@ class Page extends React.Component {
   	}
 
 	render() {
-		return <img src={require(this.state.image)}/>
+		//return <img src={require(this.state.image)}/>
+		//return <img src={this.state.image}/>
 	}
 }
 
