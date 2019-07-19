@@ -7,4 +7,6 @@ dist
 /*.mp4
 /*.log
 /*.lock
-src/images
+src/images/*
+test
+comics
