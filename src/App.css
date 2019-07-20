@@ -1,12 +1,20 @@
 html, * {
 	margin: 0;
 	padding: 0;
+    touch-action: manipulation;
+    cursor: 'pointer';
 }
 
 body {
-        margin: 0;
-        padding: 0;
-        overflow: hidden;
-        background-color: #f0f0f0;
-	display: block;
-      }
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background-color: #f0f0f0;
+    display: block;
+}
+
+#stage-parent {
+    width: 100%;
+}
+
+

@@ -5,36 +5,49 @@
   "author": "Joaqim Planstedt",
   "homepage": "https://joaqim.github.io/ul-gh-pages",
   "scripts": {
-    "start": "webpack-dev-server --disable-host-check --inline --content-base dist/ --port 8080 --host 0.0.0.0 --hot --open",
+    "start": "webpack-dev-server --disable-host-check --inline --content-base dist/ --port 8080 --host 0.0.0.0 --hot",
     "build": "npm run clean && npm run compile",
     "clean": "rm -rf ./dist/index.bundle.js",
     "compile": "NODE_ENV=production webpack --config ./webpack.config.babel.js --progress",
     "predeploy": "yarn run build",
-    "deploy": "gh-pages -b master -d redirect_dist",
-    "deploy": "aws s3 sync dist/ s3://comic-editor"
+    "deploy": "gh-pages -b master -d dist",
+    "aws-deploy": "aws s3 sync dist/ s3://comic-editor"
+
   },
   "devDependencies": {
-    "babel-core": "^6.26.0",
+    "babel-core": "^6.26.3",
     "babel-loader": "^7.1.2",
     "babel-plugin-transform-class-properties": "^6.24.1",
     "babel-preset-env": "^1.6.1",
     "babel-preset-react": "^6.24.1",
+    "copy-webpack-plugin": "^5.0.3",
     "file-loader": "^3.0.1",
+    "filesystem": "^1.0.1",
     "gh-pages": "^2.0.1",
     "html-webpack-plugin": "^2.30.1",
     "image-webpack-loader": "^4.6.0",
     "typeface-roboto": "^0.0.54",
     "url-loader": "^1.1.2",
     "webpack": "^3.10.0",
+    "webpack-cli": "^3.3.6",
     "webpack-dev-server": "^2.9.7"
   },
   "dependencies": {
+    "@hot-loader/react-dom": "^16.8.6",
+    "arrow-keys-react": "^1.0.6",
     "bwip-js": "^1.7.1",
     "css-loader": "^2.1.0",
+    "konva": "^3.4.1",
+    "lodash": "^4.17.15",
     "react": "^16.2.0",
     "react-dom": "^16.2.0",
     "react-hot-loader": "next",
+    "react-image-crop": "^8.1.0",
+    "react-konva": "^16.8.7-3",
     "react-refetch": "^1.0.4",
-    "style-loader": "^0.23.1"
+    "react-scrolllock": "^4.0.1",
+    "style-loader": "^0.23.1",
+    "swipe-react": "^1.0.4",
+    "use-image": "^1.0.4"
   }
 }

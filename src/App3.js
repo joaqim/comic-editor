@@ -10,16 +10,16 @@ import { Stage, Layer, Rect, Image } from 'react-konva'
 import useImage from 'use-image'
 //import URLImage from './URLImage.js'
 
-import Cropper from 'react-easy-crop'
+//import Cropper from 'react-easy-crop'
 
-import ReactCrop from 'react-image-crop';
+//import ReactCrop from 'react-image-crop';
 
 import 'react-image-crop/dist/ReactCrop.css';
 import Portal from './Portal.js';
 
 import PropTypes from 'prop-types';
 
-import KeyHandler, { KEYPRESS } from 'react-key-handler';
+//import KeyHandler, { KEYPRESS } from 'react-key-handler';
 import ArrowKeysReact from 'arrow-keys-react'
 import ScrollLock, { TouchScrollable } from 'react-scrolllock';
 
@@ -30,29 +30,36 @@ import './App.css';
 //import 'typeface-roboto'
 
 
+const HQ = true;
 
-function createPanels(comic) {
+function createPanels(page) {
 	let panels = [];
-    	Object.keys(comic).forEach(function(key) {
+    	Object.keys(page['panels']).forEach(function(key) {
 
-	console.log(key + "-" + comic[key]);
-	var val = comic[key];
+	console.log(key + "-" + page['panels'][key]);
+	var val = page['panels'][key];
 	switch(key) {
 	case 'img_size':
-		//console.log("size: "+val);
+		console.log("size: "+val);
 		//size = val;
 		break;
 	case 'filename':
-		//console.log("filename: "+val);
+		console.log("filename: "+val);
 		//img_src = val;
 		break;
 	case 'num_panels':
+		console.log("num_panels: "+val);
 		break
 	case 'comic_title':
 		break;
+	case 'scaleX':
+		break;
+	case 'scaleY':
+		break;
 	default:
-		if (typeof comic[key] != 'object') break;
-		//console.log("else: "+val);
+		if (typeof page['panels'][key] != 'object') break;
+		console.log("else: ");
+		console.log(val);
 		//panels.push(val);
 		panels[key] = val
 		break;
@@ -66,18 +73,17 @@ class Panel extends React.Component {
 
 	constructor(props) {
 		super(props)
-		//this.state = { active: false };
+		this.state = { active: false };
 
 		this.toggleActiveState = this.toggleActiveState.bind(this);
   	}
+
   toggleActiveState () {
-	//console.log('toggleActiveState');
-	alert('toggleActiveState');
-/*
+	console.log('toggleActiveState');
+//	alert('toggleActiveState');
     this.setState({
       active: !this.state.active
     });
-*/
   }
 
 
@@ -85,19 +91,17 @@ class Panel extends React.Component {
 	var ghost = new Konva.Tween({
         	node: this.rect,
         	duration: 0.6,
-        	opacity: 0
+        	opacity: 0.7
       	});
-	//ghost.play();
+//	ghost.play();
 	//ghost.to({opacity: 1})
 
 	}
-/*
 	componentWillMount() {
 		if (this.props.active) {
 			this.setState({active: true})
 		}
 	}
-*/
 
 	render = () => {
 	const stroke = this.props.active ? '' : 'black';
@@ -149,7 +153,6 @@ class MyImage extends Component {
   }
 
 
-
   updateImage() {
     const image = new window.Image();
     image.src = this.props.image;
@@ -161,7 +164,7 @@ class MyImage extends Component {
   }
 
   render() {
-    return <Image image={this.state.image} x={this.props.x} y={this.props.y} width={this.props.width} height={this.props.height}/>;
+    return <Image image={this.state.image} x={this.props.x} y={this.props.y} width={this.props.width} height={this.props.height} scaleX={this.props.scaleX} scaleY={this.props.scaleY}/>;
   }
 }
 
@@ -189,7 +192,8 @@ class Dropdown extends React.Component {
 }
 
 const stageStyle = {
-	margin: 'auto'
+	margin: 'auto',
+	width: '100%'
 }
 
 var onLeftButton = function() {
@@ -238,11 +242,22 @@ function getCrop(panel, offsetX=0, offsetY=0) {
 		}
 
 
+		let gutter = 30;
+		//let scaleOffsetX = scaleX / gutter;
+		//let scaleOffsetX = scaleX / gutter;
+
+		let scaleOffsetX = 0;
+		let scaleOffsetY = 0;
+
 		var crop = {
-			x: x + offsetX,
-			y: y + offsetY,
-			scale: {x: scaleX, y: scaleY}
+			x: x + offsetX - gutter,
+			y: y + offsetY - gutter,
+			scale: {
+				x: scaleX + scaleOffsetX,
+				y: scaleY + scaleOffsetY
+			}
 		}
+
 	return crop;
 }
 
@@ -256,29 +271,49 @@ class Page extends React.Component {
 		console.log(this.props);
 
 		let curPanel = this.props.curPanel ? this.props.curPanel : 0;
-		let panel = this.props.panels[curPanel];
-		if(this.props.panel != undefined) {
+		if(this.props.panel === undefined) {
+			var panel = this.props.panels[curPanel];
+		}
+		if(panel != undefined) {
 			var crop = getCrop(panel);
 		} else {
-			var crop = { x: 0, y: 0, scale: 1, scale: 1 };
+			var crop = { x: 0, y: 0, scaleX: 1, scaleY: 1 };
 		}
 
 		this.state = {
 			curPanel: curPanel,
 			panel: panel,
 			crop: crop,
-			panelView: false
+			panelView: true
 		}
 	}
 componentDidMount() {
 	if(this.state.panelView) this.zoomOn();
 }
-componentDidUpdate() {
-	if(this.state.panelView) this.zoomOn();
+
+componentDidUpdate(prevProps) {
+  if (this.props.curPanel !== prevProps.curPanel || this.props.panels !== prevProps.panels) {
+	let curPanel = this.props.curPanel;
+	let panel = this.props.panels[curPanel];
+	this.setState({
+		curPanel: curPanel,
+		panel: this.props.panels[curPanel],
+		crop: getCrop(panel)
+	});
+  }
+
+   if(this.state.panelView) this.zoomOn();
 }
 
 zoomOn() {
+
+	if (!this.state.panelView) return;
 	//TODO: Dynamic speed ( x amount of pixels/second )
+	if (this.state.crop.scaleX !== this.state.crop.scaleX) { // Looking for NaN, maybe should be compared to undefined ?, (NaN can never equal itself )
+		return;
+	}
+	console.log("Crop: ")
+	console.log(this.state.crop);
 	var tween = new Konva.Tween({
         	node: this.layer,
         	duration: 0.6,
@@ -289,7 +324,6 @@ zoomOn() {
 		easing: Konva.Easings['ElasticEase']
       	});
 	tween.play();
-
 }
 
 shouldComponentUpdate(nextProps, nextState) {
@@ -307,36 +341,48 @@ newPanel = (event) => {
     	let curPanel = event.target.value;
 	this.setState({
 		curPanel: curPanel,
+        /*
 		panel: this.props.panels[curPanel],
         crop: getCrop(this.props.panels[curPanel])
-    });
+        */
+    	});
         //this.props.newPanel(event);
 }
 
 newPage  = (event) => {
-    	console.log("newPage: Event.target.value is", event.target.value);
 	let curPanel = 0;
 	this.setState({
-		curPanel: curPanel,
+		curPage: event.targe.value,
+/*
 		panel: this.props.panels[curPanel],
 		crop: getCrop(this.props.panels[curPanel])
+*/
 	})
     	this.props.onChange(event);
 }
 
 	//<Dropdown options={this.props.comic} value={this.props.curPage} onChange={this.newPage}/>
-	//<Stage style={stageStyle} x={this.props.offsetX} y={this.props.offsetY}  width={window.innerWidth + this.props.offsetX} height={window.innerHeight + this.props.offsetY}>
+	//<Stage style={stageStyle} x={this.props.offsetX} y={this.props.offsetY}  width={this.props.img.width + this.props.offsetX} height={this.props.img.height + this.props.offsetY}>
 render() {
 	console.log("Page Render");
 	console.log(this.state.curPanel);
 return (
 <div>
-<div style={stageStyle}>
+<div style={stageStyle} id="stage-parent">
 	<Dropdown options={this.props.panels} value={this.state.curPanel} onChange={this.newPanel}/>
 
-	<Stage style={stageStyle} x={this.props.offsetX} y={this.props.offsetY}  width={this.props.img.width + this.props.offsetX} height={this.props.img.height + this.props.offsetY}>
+	<Stage style={stageStyle} x={this.props.offsetX} y={this.props.offsetY}  width={window.innerWidth + this.props.offsetX} height={window.innerHeight + this.props.offsetY} ref={node => {this.stage=node}}>
 	<Layer ref={node => {this.layer=node}}>
-			<MyImage image={this.props.img.src} x={this.props.offsetX} y={this.props.offsetY} width={this.props.img.width + this.props.offsetY} height={this.props.img.height + this.props.offsetY}/>
+			<MyImage
+				image={this.props.img.src}
+				x={this.props.offsetX}
+				y={this.props.offsetY}
+				width={this.props.img.width + this.props.offsetY}
+				height={this.props.img.height + this.props.offsetY}
+				scaleX={this.props.img.scaleX}
+				scaleY={this.props.img.scaleY}
+			/>
+
 			{this.props.panels.map((item, index) => (
 				<Panel key={index} active={index == this.state.curPanel} x={item.x + this.props.offsetX} y={item.y + this.props.offsetY} width={item.width + this.props.offsetX} height={item.height + this.props.offsetY}/>)
 			)}
@@ -384,13 +430,25 @@ function deepWalk(collection, childKeys, iteratee) {
 }
 
 		//if (typeof json[key] != 'object') break;
-function loadComics(data) {
-	let comics = [];
+function loadComic(data) {
+	let comic = [];
+	console.log(data);
     	Object.keys(data).forEach(function(key) {
-		comics[key] = data[key];
-		//require.context('./comics'+key, true, /\.(png|jpe?g|svg)$/);
+		console.log(key);
+		let key_int = parseInt(key, 10);
+/*
+		switch(key){
+		case 'filename':
+			comics['filename']  = data[key];
+			break
+		case 'img_size':
+			comics['img_size']  = {x: data[key][0], y: data[key][1]};
+			break
+		default:
+*/
+			comic[key_int] = data[key]; // Turn json keys into array indices (hopefully)
 	});
-	return comics;
+	return comic;
 
 //console.log(_.map(data, (el => _.pick(el, ['file']))));
 /*
@@ -418,7 +476,7 @@ deepWalk(database, ['type'], function(value) {
 
 //const page = comics[30][0];
 
-//const json = require('./comics/'+database[19]);
+//const json = require('./somics/'+database[19]);
 //const json = require('./comics/Vol.01 Ch.0001 - ROMANCE DAWN - The Dawn of the Adventure (gb) [PowerManga]/020.json');
 
 //const json = require('./030.json');
@@ -430,22 +488,34 @@ deepWalk(database, ['type'], function(value) {
 
 
 
+
+
 class ComicReader extends React.Component {
 	constructor(props) {
 		super(props)
 
 		let curPage = 0;
 		let curPanel = 0;
-		var img_src = this.props.comic[curPage]['filename'];
+		console.log(this.props.comic[curPage]);
+		let img_src = this.props.comic[curPage]['filename'];
+
+// If high-quality:
+		//let img_src_arr = img_src.split(/[\/]+/);
+		//console.log("Image path arry: " + img_src_arr);
+		//let img_name = img_src_arr.pop();
+		//let img_path = img_src_arr.join('/');
+		//img_src = img_path + '/hq/' + img_name;
+// Endif
 		this.state = {
 			comic: this.props.comic,
 			img_src: img_src,
-			curPage: curPage,
 			curPanel: curPanel,
 			page: this.props.comic[curPage],
 			panels: createPanels(this.props.comic[curPage]),
+			curPage: curPage,
 			pagesCount: this.props.comic.length
 		}
+
 
 		this.changePage = this.changePage.bind(this);
 		this.nextPage = this.nextPage.bind(this);
@@ -475,19 +545,51 @@ changePage = (event) => {
     	console.log("ComicReader: Event.target.value is", event.target.value);
 	let curPage = event.target.value;
 	let curPanel = 0;
+
+	this.setState({
+		curPage: event.target.value,
+		curPanel: 0
+	});
+    /*
 	let page = this.state.comic[curPage];
+	let newPanels = createPanels(page);
 	this.setState({
 		curPage: curPage,
 		curPanel: curPanel,
 		page: page,
 		img_src: page['filename'],
-		panels: createPanels(page)
+		panels: createPanels(page),
+		panel: newPanels[curPanel],
+		crop: newPanels[curPanel]
 	});
-
+    this.updatePage();
+*/
 }
+
+updatePage = ()  => {
+	let curPage = this.state.curPage;
+	let curPanel = 0;
+	let page = this.state.comic[curPage];
+	let newPanels = createPanels(page);
+	this.setState({
+		curPage: curPage,
+		curPanel: curPanel,
+		page: page,
+		img_src: page['filename'],
+		panels: createPanels(page),
+		panel: newPanels[curPanel],
+		crop: newPanels[curPanel]
+	});
+}
+
 
 nextPage = () => {
 	let newPage = this.state.curPage+1;
+	this.setState({
+		curPage: newPage,
+		curPanel: 0,
+	})
+/*
 	if(newPage < this.state.comic.length) {
 		let newPageObj = this.props.comic[newPage];
 		this.setState({
@@ -496,20 +598,43 @@ nextPage = () => {
 			img_src: newPageObj['filename'],
 			page: newPageObj,
 			panels: createPanels(newPageObj),
+			width: newPageObj['img_size'][0],
+			height: newPageObj['img_size'][1],
+			scaleX: newPageObj['scaleX'],
+			scaleY: newPageObj['scaleY']
 		});
 	}
+*/
 }
 
 nextPanel = () => {
 	let newPanel = this.state.curPanel+1;
 	if(newPanel < this.state.panels.length) {
 		this.setState({
-			curPanel: newPanel,
-			crop: getCrop(this.state.panels[newPanel])
+			curPanel: newPanel
+//			panel: this.state.panels[newPanel]
 		});
 	} else {
 		this.nextPage();
 	}
+}
+
+
+componentDidUpdate(prevProps, prevState) {
+  if (this.state.curPage !== prevState.curPage || this.state.panels !== prevState.panels) {
+	this.updatePage();
+/*
+	let curPanel = this.state.curPanel;
+	let panel = this.state.panels[curPanel];
+	this.setState({
+		curPanel: curPanel,
+		panel: this.state.panels[curPanel],
+		crop: getCrop(panel),
+		panels: createPanels(this.props.comic[this.state.curPage]),
+	});
+*/
+
+  }
 }
 
 shouldComponentUpdate(nextProps, nextState) {
@@ -522,18 +647,39 @@ shouldComponentUpdate(nextProps, nextState) {
       return false;
   }
 
+fitStageIntoParentContainer() {
+        var container = document.querySelector('#stage-parent');
+	let stageWidth = window.innerWidth;
+	let stageHeight = window.innerHeight;
+
+        // now we need to fit stage into parent
+        var containerWidth = container.offsetWidth;
+        // to do this we need to scale the stage
+        var scale = containerWidth / stageWidth;
+
+        this.stage.width(stageWidth * scale);
+        this.stage.height(stageHeight * scale);
+        this.stage.scale({ x: scale, y: scale });
+        this.stage.draw();
+      }
+
 
 
 	//<Dropdown options={this.props.comics} value={this.state.curComic} onChange={this.changeComic}/>
 	render() {
 	//console.log('redraw')
+	//<Dropdown options={this.state.comic} value={this.state.curPage} onChange={this.changePage}/>
 	return(
 <div {...ArrowKeysReact.events} tabIndex="1">
-	<Dropdown options={this.state.comic} value={this.state.curPage} onChange={this.changePage}/>
+	<Dropdown options={
+		Object.values(this.state.comic)
+	} value={this.state.curPage} onChange={this.changePage}/>
 	<Page 	img={{
 			src: this.state.img_src,
 			width: this.state.page['img_size'][0],
-			height: this.state.page['img_size'][1]
+			height: this.state.page['img_size'][1],
+			scaleX: this.state.scaleX,
+			scaleY: this.state.scaleY
 		}}
 		curPanel={this.state.curPanel}
 		panels={this.state.panels}
@@ -550,27 +696,34 @@ shouldComponentUpdate(nextProps, nextState) {
 	}
 }
 
-import database from '../comics/comics.json';
+//import database from '../comics/comics.json';
+//import database from '../comics/current/comics.json';
+
+//import database from '../dist/comics_hq.json';
+import database from '../dist/comics.json';
 console.log("Database: ");
 console.log(database);
 
-//const comics = loadComics(database);
-const comics = loadComics(database["One Piece"]);
+const comic_name = 'Vol.28 Ch.0263 - Pirate Nami and the Sky Knight vs. Vice Captains Hotori and Kotori (gb) [PowerManga]';
+//const comic_name = 'Vol.01 Ch.0001 - ROMANCE DAWN - The Dawn of the Adventure (gb) [PowerManga]';
+//const comic = loadComic(database["One Piece"][comic_name]); // Loads one comic -> multiple pages
 
-console.log(comics);
+/*
+const comic = database["One Piece"][comic_name];
+console.log("Comic: ");
+console.log(comic);
+
 
 class App extends React.Component {
 	constructor(props) {
 		super(props)
 
-		//var comic = comics['Vol.01 Ch.0001 - ROMANCE DAWN - The Dawn of the Adventure (gb) [PowerManga]_']
-		//var comic = comics['Vol.01 Ch.0001 - ROMANCE DAWN - The Dawn of the Adventure (gb) [PowerManga]_'];
-		var comic = comics['Vol.28 Ch.0263 - Pirate Nami and the Sky Knight vs. Vice Captains Hotori and Kotori (gb) [PowerManga]'];
-		//var comic = comics[0];
+        const comic = database["One Piece"][comic_name];
+        console.log("Comic: ");
+        console.log(comic);
 
-		console.log(comic);
+
 		this.state = {
-			redraw: false,
 			comic: comic
 		}
  	this.handleChange = this.handleChange.bind(this);
