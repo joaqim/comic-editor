@@ -10,7 +10,8 @@
     "clean": "rm -rf ./dist/index.bundle.js",
     "compile": "NODE_ENV=production webpack --config ./webpack.config.babel.js --progress",
     "predeploy": "yarn run build",
-    "deploy": "gh-pages -b master -d dist"
+    "deploy": "gh-pages -b master -d redirect_dist",
+    "deploy": "aws s3 sync dist/ s3://comic-editor"
   },
   "devDependencies": {
     "babel-core": "^6.26.0",
