@@ -51,8 +51,7 @@ class Page extends React.Component {
 		//comp.setState({images: image_arr})
 		comp.setState({image: img})
 		console.log(img)
-		image_arr.map(name => `<img src='${name}' alt='${name}' />`);
-
+		image_arr.map(name => `<img src='${require.context(name)}' alt='${name}' />`);
 	}
 
 	componentDidMount() {
@@ -67,8 +66,40 @@ class Page extends React.Component {
 	}
 }
 
+const pathToComic = require.context('./images', true);
+
+function importAll(r) {
+	let images = {};
+	r.keys().map((item, index) => { images[item.replace('./', '')] = r(item); });
+	return images;
+}
+
+class Example extends React.Component {
+  constructor(props) {
+	super(props)
+	this.state = {
+		images: []
+	}
+	this.setState({images: importAll(require.context('./images', true, /\.(png|jpe?g|svg)$/))});
+	}
+  render() {
+    return (
+      <div>
+        {Object.keys(pages).map(key => (
+          <div>
+            {pages[key].type}
+//pages.map(name => `<img src='${pathToComic(name, true)}' alt='${name}' />`);
+
+           <img src={pathToComic(pages[key].filename)} key={key} />
+          </div>
+        ))}
+      </div>
+    );
+  }
+}
+
 const App = () => (
-    <div> <Body/> </div>
+    <div> <Example/> </div>
 )
 
 export default hot(module)(App)

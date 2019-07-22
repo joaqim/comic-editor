@@ -1,5 +1,6 @@
 /* eslint-disable */
 const path = require('path')
+require('dotenv').config()
 const webpack = require('webpack')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 
@@ -9,6 +10,9 @@ module.exports = {
     path: path.join(__dirname, 'dist'),
     filename: 'bundle.js',
   },
+	node: {
+  	fs: 'empty'
+	},
 resolve: {
     alias: {
       'react-dom': '@hot-loader/react-dom'
@@ -42,7 +46,7 @@ resolve: {
 
 	}, {
 		test: /\.(jpe?g|png|gif|svg)$/,
-		loaders: [{
+		loader: [{
 			loader: 'file-loader',
 			options: {
 				name: '[name].[hash:base64:5].[ext]',

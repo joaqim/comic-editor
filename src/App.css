@@ -3,6 +3,7 @@ html, * {
 	padding: 0;
     touch-action: manipulation;
     cursor: 'pointer';
+
 }
 
 body {
@@ -11,6 +12,7 @@ body {
     overflow: hidden;
     background-color: #f0f0f0;
     display: block;
+    -webkit-overflow-scrolling: touch;
 }
 
 #stage-parent {

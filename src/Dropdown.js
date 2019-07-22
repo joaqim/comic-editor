@@ -9,11 +9,11 @@ export default class Dropdown extends Component {
 
   handleChange = (event) => {
     this.setState({ value: event.target.value });
-    this.props.onChange(event);
+    this.props.onChange(event.target.value);
   }
   render() {
     return (
-     <select onChange={this.handleChange} defaultValue={this.props.value}>
+     <select onChange={this.handleChange} defaultValue={this.props.defaultValue}>
       {this.props.options.map((item, index) => <option key={index}>{index}</option>)}
     </select>
     )

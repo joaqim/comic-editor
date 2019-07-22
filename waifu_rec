@@ -1,0 +1,14 @@
+#!/usr/bin/env fish
+
+for f in (find . -name '*.png' | sed -e '/\/hq\//d')
+	set DIR (dirname "$f")
+	if test -e $DIR/hq/(basename -- "$f")
+		continue
+	end
+	if test (df . | grep 99% )
+		exit $status
+	end
+	mkdir $DIR/hq
+	waifu2x-converter-cpp -i "$f" -o $DIR/hq/(basename -- "$f")
+end
+

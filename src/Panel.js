@@ -11,11 +11,10 @@ export default class Panel extends Component {
   	}
 
   toggleActiveState () {
-      //console.log('toggleActivestate:')
     this.setState({
       active: !this.state.active
     });
-      this.props.changePanel(this.props.panelNum)
+      this.props.changePanel(this.props.panel_nr)
   }
 
     componentDidMount() {
@@ -41,20 +40,19 @@ export default class Panel extends Component {
     render = () => {
         const stroke = this.state.active ? '' : 'black';
         const fill = this.state.active ? '' : 'black';
-        const opacity = this.state.active ? 0 : 0.7;
-        //const stroke = 'red';
+        const opacity = this.state.active ? 0 : 0.2;
         return (
                 <Rect
             onTap={this.toggleActiveState}
             x={this.props.x}
             y={this.props.y}
             onClick={this.toggleActiveState}
-            //className={`zoom-img ${this.state.active}`}
             width={this.props.width}
             height={this.props.height}
             fill={fill}
-            stroke={stroke}
-            shadowBlur={5}
+            //stroke={stroke}
+            stroke={'red'}
+            shadowBlur={30}
             opacity={opacity}
 		    ref={node => {
               	this.rect = node;

@@ -48,8 +48,9 @@ args = parser.parse_args()
 class Pro:
     def __init__(self):
         self.rel_dir = args.dir;
-        if self.rel_dir[0] == '.':
-            self.rel_dir = self.rel_dir[2:] # Remove beginning './' from relative_dir
+        if self.rel_dir != './':
+            if self.rel_dir[0] == '.':
+                self.rel_dir = self.rel_dir[2:] # Remove beginning './' from relative_dir
         self.json_file_hq = open(self.rel_dir+'/comics_hq.json', 'w');
 
     def process_page(self):
@@ -59,7 +60,7 @@ class Pro:
         if img_path[0] == '.':
             img_path = img_path[2:] # Remove beginning './' from relative_dir
 
-       
+
         hq_path = Path(self.rel_dir + '/' + str(img_path) + '/hq');
 
         if not hq_path.is_dir():

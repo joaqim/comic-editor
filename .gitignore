@@ -1,6 +1,7 @@
 node_modules
 frames
 dist
+.env
 /*.png
 /*.webp
 /*.xcf
