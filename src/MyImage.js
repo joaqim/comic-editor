@@ -6,15 +6,12 @@ export default class MyImage extends Component {
     state = {
         img: {
             image: null,
-            src: this.props.page['filename_hq'], //TODO: if hq
-            width: this.props.page['img_size'][0],
-            height: this.props.page['img_size'][1],
-            scaleX: this.props.page['scaleX'],
-            scaleY: this.props.page['scaleY'],
-            scaleX: 1,
+            x: 0,
+            y: 0,
+            width: 0,
+            height: 0,
             scaleY: 1,
-            x: this.props.x,
-            y: this.props.x
+            scaleX: 1,
         },
     };
 
@@ -22,7 +19,8 @@ export default class MyImage extends Component {
         page: PropTypes.any.isRequired,
     };
 
-    componentDidMount() {
+   // componentDidMount() {
+    componentWillMount() {
         this.updateImage();
     }
 
@@ -31,34 +29,45 @@ export default class MyImage extends Component {
     }
 
     updateImage() {
-        if(typeof this.state.img === 'undefined' || typeof this.state.img.src === 'undefined') {
-            return;
-        }
+       // if(typeof this.state.img === 'undefined' || typeof this.state.img.src === 'undefined') {
+        //    return;
+        //}
+        if(typeof this.props.page === 'undefined' || typeof this.props.page['filename_hq'] === 'undefined') return;
+
+
         const image = new window.Image();
-        image.src = 'https://comic-editor.s3.eu-north-1.amazonaws.com/' + this.state.img.src;
+        let img_src = this.props.page['filename_hq'];
+        image.src = 'https://comic-editor.s3.eu-north-1.amazonaws.com/' + img_src;
 
         image.onload = () => {
-            this.setState({
-                img: {image: image}
-            });
+        this.setState({
+            img: {
+                image: image,
+                /*
+                width: this.props.page['img_size'][0],
+                height: this.props.page['img_size'][1],
+                */
+            },
+            /*
+            scaleX: this.props.page['scaleX'],
+            scaleY: this.props.page['scaleY'],
+            x: this.props.x,
+            y: this.props.x
+            */
+        })
         };
-/*
-        Konva.Image.fromUrl('https://comic-editor.s3.eu-north-1.amazonaws.com/' + this.state.img.src, function(image) {
-            this.setState({
-                img: {image: image}
-            });
-        });
-        */
 
     }
 
     render() {
         return <Image
         image={this.state.img.image}
+        /*
         x={this.state.img.x}
         y={this.state.img.y}
-        width={this.state.img.width}
-        height={this.state.img.height}
+        */
+        //width={this.state.img.width}
+        //height={this.state.img.height}
         /*
         scaleX={this.state.img.scaleX}
         scaleY={this.state.img.scaleY}

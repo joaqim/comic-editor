@@ -13,18 +13,16 @@ const stageStyle = {
 	width: '100%'
 }
 
-
-
 export default class ComicReader extends Component {
     constructor(props) {
         super(props)
 
-        let curPage = 3;
+        let curPage = 0;
         let curPanel = 0;
 
         let page = this.props.comic[curPage];
 
-        console.log(this.props.comic[curPage]);
+        //console.log(this.props.comic[curPage]);
 /*
         let img_src = this.props.comic[curPage]['filename'];
 
@@ -45,7 +43,8 @@ export default class ComicReader extends Component {
             scaleX: page['scaleX'],
             scaleY: page['scaleY'],
             stageWidth: window.innerWidth,
-            stageHeight: window.innerHeight
+            stageHeight: window.innerHeight,
+            images: this.getImages()
         }
 
 
@@ -54,17 +53,17 @@ export default class ComicReader extends Component {
 
         ArrowKeysReact.config({
             left: () => {
-                console.log('left key detected.');
+                //console.log('left key detected.');
                 this.nextPanel();
             },
             right: () => {
-                console.log('right key detected.');
+                //console.log('right key detected.');
             },
             up: () => {
-                console.log('up key detected.');
+                //console.log('up key detected.');
             },
             down: () => {
-                console.log('down key detected.');
+                //console.log('down key detected.');
                 this.nextPage();
             }
         });
@@ -72,8 +71,26 @@ export default class ComicReader extends Component {
 
     }
 
+    getImages = () => {
+        let images = [];
+        let comic = this.props.comic;
+        Object.keys(comic).forEach(function(page_nr) {
+            console.log(page_nr)
+            Object.keys(comic[page_nr]).forEach(function(key) {
+            console.log(key + ' - ' + comic[page_nr][key])
+                if(key == 'filename_hq') {
+                    images[page_nr] = {
+                            key: page_nr,
+                            src: comic[page_nr]['filename_hq']
+                    }
+                }
+            });
+        });
+        return images;
+    }
+
     fitStageIntoParentContainer = () => {
-        console.log('fitStageintoparentcontainer')
+        //console.log('fitStageintoparentcontainer')
         var container = document.querySelector('#stage-parent');
 
         // now we need to fit stage into parent
@@ -101,6 +118,13 @@ export default class ComicReader extends Component {
 
     componentDidMount() {
         window.addEventListener('resize', this.resize)
+        //this.refs.stage.on('tap', function(event) {
+        /*
+        window.addEventListener('onClick', function(event) {
+            console.log('tap: ')
+            console.log(event.pointerPos)
+        })
+        */
     }
 
     componentWillUnmount() {
@@ -109,18 +133,22 @@ export default class ComicReader extends Component {
 
     changePage = (event) => {
         console.log("ComicReader: Event.target.value is", event.target.value);
+        /*
         this.setState({
             curPage: event.target.value,
             curPanel: 0
         });
+        */
     }
 
     nextPage = () => {
+        /*
         let newPage = this.state.curPage+1; //TODO: Check four out of bounds
         this.setState({
             curPage: newPage,
             curPanel: 0,
         })
+        */
     }
 
     shouldComponentUpdate(nextProps, nextState) {
@@ -139,14 +167,15 @@ export default class ComicReader extends Component {
     }
 
     //<Dropdown options={this.props.comics} value={this.state.curComic} onChange={this.changeComic}/>
+                //<Dropdown options={Object.keys(this.props.comic[this.state.curPage])} value={this.state.curPage} onChange={this.changePage}/>
     render() {
-        console.log('redraw')
-        //<Dropdown options={this.props.comic} value={this.state.curPage} onChange={this.changePage}/>
+        console.log('re-render comicreader')
         return(
                 <div
             {...ArrowKeysReact.events} tabIndex="1"
             id={'stage-parent'}
                 >
+                <Dropdown options={this.state.images} value={this.state.curPage} onChange={this.changePage}/>
 
                 <Stage
             //ref={node => {this.stage=node}}>
@@ -158,7 +187,9 @@ export default class ComicReader extends Component {
                 >
 
                 <Page
-            page={this.props.comic[this.state.curPage]}
+            comic={this.props.comic}
+            images={this.state.images}
+            curPage={this.state.curPage}
             //width={this.state.width}
             //height={this.state.height}
             />
