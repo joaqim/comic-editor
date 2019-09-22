@@ -1,5 +1,5 @@
 import React from 'react'
- 
+
 //export function getScaleX(w1, h1, w2, h2) {
 export function getScaleX(w) {
     return Math.max(w / window.innerWidth, window.innerWidth / w)
@@ -13,7 +13,7 @@ export function loadPanels(page) {
     let panels = [];
     Object.keys(page['panels']).forEach(function(key) {
         //Ensure that the key contais number
-        if(!isNaN(key)) { 
+        if(!isNaN(key)) {
             //Ensure that the value is an object
             let val = page['panels'][key];
             if (typeof val == 'object') {
